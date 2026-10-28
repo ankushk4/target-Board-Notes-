@@ -1,0 +1,215 @@
+package in.targetboardnotes.app
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+
+data class Chapter(
+    val title: String,
+    val subject: String,
+    val notes: String,
+    val questions: List<Pair<String, String>>,
+    val mcq: List<String>
+)
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            TargetBoardNotesApp()
+        }
+    }
+}
+
+@Composable
+fun TargetBoardNotesApp() {
+    var selectedChapter by remember {
+        mutableStateOf<Chapter?>(null)
+    }
+    var selectedTab by remember { mutableIntStateOf(0) }
+
+    val chapters = listOf(
+        Chapter(
+            title = "यूरोप में राष्ट्रवाद",
+            subject = "इतिहास",
+            notes = "राष्ट्रवाद साझा राष्ट्रीय पहचान और राष्ट्र के प्रति जुड़ाव की भावना है। यह नमूना नोट्स है।",
+            questions = listOf(
+                "राष्ट्रवाद क्या है?" to
+                    "राष्ट्र के प्रति जुड़ाव की भावना राष्ट्रवाद कहलाती है।",
+                "राष्ट्र-राज्य क्या है?" to
+                    "साझा राष्ट्रीय पहचान वाला राजनीतिक राज्य राष्ट्र-राज्य कहलाता है।"
+            ),
+            mcq = listOf(
+                "राष्ट्रवाद किससे संबंधित है?",
+                "राष्ट्र-राज्य किस प्रकार की इकाई है?"
+            )
+        ),
+        Chapter(
+            title = "रासायनिक अभिक्रियाएँ",
+            subject = "विज्ञान",
+            notes = "रासायनिक अभिक्रिया में पदार्थ बदलकर नए पदार्थ बनाते हैं।",
+            questions = listOf(
+                "रासायनिक अभिक्रिया क्या है?" to
+                    "वह प्रक्रिया जिसमें नए पदार्थ बनते हैं।"
+            ),
+            mcq = listOf(
+                "रासायनिक समीकरण क्यों संतुलित करते हैं?"
+            )
+        )
+    )
+
+    MaterialTheme {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text("Target Board Notes")
+                    }
+                )
+            }
+        ) { padding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(16.dp)
+            ) {
+                Text(
+                    "बिहार बोर्ड 2026–2027",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(Modifier.height(12.dp))
+
+                if (selectedChapter == null) {
+                    Text("विषय और अध्याय चुनें")
+
+                    LazyColumn {
+                        items(chapters) { chapter ->
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 6.dp)
+                                    .clickable {
+                                        selectedChapter = chapter
+                                        selectedTab = 0
+                                    }
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(16.dp)
+                                ) {
+                                    Text(
+                                        chapter.title,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Text(chapter.subject)
+                                    Text("Notes • Q&A • MCQ")
+                                }
+                            }
+                        }
+                    }
+
+                    Spacer(Modifier.height(12.dp))
+
+                    Button(
+                        onClick = {
+                            selectedTab = 3
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Admin Panel")
+                    }
+
+                    if (selectedTab == 3) {
+                        Text(
+                            "Admin Panel का शुरुआती स्थान। " +
+                            "सुरक्षित लॉगिन और सामग्री अपलोड " +
+                            "की सुविधा अलग से बनानी होगी।"
+                        )
+                    }
+                } else {
+                    val chapter = selectedChapter!!
+
+                    TextButton(
+                        onClick = {
+                            selectedChapter = null
+                        }
+                    ) {
+                        Text("← वापस जाएँ")
+                    }
+
+                    Text(
+                        chapter.title,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Spacer(Modifier.height(12.dp))
+
+                    TabRow(selectedTabIndex = selectedTab.coerceIn(0, 2)) {
+                        listOf("Notes", "Q&A", "MCQ")
+                            .forEachIndexed { index, title ->
+                                Tab(
+                                    selected = selectedTab == index,
+                                    onClick = { selectedTab = index },
+                                    text = { Text(title) }
+                                )
+                            }
+                    }
+
+                    Spacer(Modifier.height(16.dp))
+
+                    when (selectedTab) {
+                        0 -> Text(chapter.notes)
+
+                        1 -> LazyColumn {
+                            items(chapter.questions) { qa ->
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 5.dp)
+                                ) {
+                                    Column(
+                                        modifier = Modifier.padding(12.dp)
+                                    ) {
+                                        Text(
+                                            qa.first,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                        Spacer(Modifier.height(6.dp))
+                                        Text(qa.second)
+                                    }
+                                }
+                            }
+                        }
+
+                        2 -> LazyColumn {
+                            items(chapter.mcq) { question ->
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 5.dp)
+                                ) {
+                                    Text(
+                                        question,
+                                        modifier = Modifier.padding(12.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
