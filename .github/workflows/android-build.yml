@@ -1,0 +1,48 @@
+name: Build Target Board Notes APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'target-board-notes.zip'
+      - '.github/workflows/android-build.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract Android project ZIP
+        run: |
+          mkdir -p android-project
+          unzip -o target-board-notes.zip -d android-project
+          find android-project -name gradlew -type f
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Build APK
+        run: |
+          GRADLEW=$(find android-project -name gradlew -type f | head -n 1)
+          if [ -z "$GRADLEW" ]; then
+            echo "gradlew file not found in ZIP"
+            exit 1
+          fi
+          PROJECT_DIR=$(dirname "$GRADLEW")
+          cd "$PROJECT_DIR"
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Target-Board-Notes-APK
+          path: android-project/**/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+          
