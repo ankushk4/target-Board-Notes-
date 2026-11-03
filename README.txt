@@ -1,0 +1,1 @@
+Target Board Notes Admin demo\nOpen admin.html in a browser. This is local demo only. It does not persist uploads, authenticate admins, or publish to GitHub Pages.\n

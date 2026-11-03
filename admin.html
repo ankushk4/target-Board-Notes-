@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="hi"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Target Board Notes — Admin</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f3f6fb;color:#172033}
+header{background:#123c75;color:white;padding:22px}main{max-width:850px;margin:20px auto;padding:0 14px}
+.card{background:white;border-radius:14px;padding:18px;margin:14px 0;box-shadow:0 3px 15px #0001}
+label{display:block;margin:12px 0 5px;font-weight:600}input,select,textarea{width:100%;padding:12px;border:1px solid #ccd4e0;border-radius:8px}
+button{background:#1457a6;color:white;border:0;padding:12px 16px;border-radius:8px;font-weight:bold;margin-top:12px}
+small{color:#667085}.notice{background:#fff4d6;padding:12px;border-radius:8px}
+</style>
+<header><h1>Target Board Notes</h1><div>Admin Panel • Notes Upload</div></header>
+<main>
+<div class="notice">यह अभी Admin Panel का demo है। अपलोड की गई फाइलें इस पेज पर ही अस्थायी रूप से दिखेंगी; लाइव वेबसाइट/सभी विद्यार्थियों तक पहुँचाने के लिए backend और सुरक्षित admin login जरूरी है।</div>
+<section class="card"><h2>नोट्स अपलोड करें</h2>
+<label>कक्षा</label><select id="course"><option>Class 10th</option><option>Class 12th Arts</option><option>Class 12th Science</option></select>
+<label>विषय</label><input id="subject" placeholder="जैसे History">
+<label>Chapter / शीर्षक</label><input id="chapter" placeholder="जैसे Chapter 1">
+<label>नोट्स PDF</label><input id="pdf" type="file" accept="application/pdf">
+<label>नोट्स की कीमत (₹)</label><input id="price" type="number" min="0" value="0">
+<button onclick="addNote()">नोट्स सूची में जोड़ें</button></section>
+<section class="card"><h2>अपलोड किए गए नोट्स (इस डेमो में)</h2><div id="items">अभी कोई नोट्स नहीं जोड़े गए।</div></section>
+<script>
+function addNote(){let f=document.getElementById('pdf').files[0],s=document.getElementById('subject').value.trim(),c=document.getElementById('chapter').value.trim();if(!f||!s||!c){alert('कक्षा, विषय, चैप्टर और PDF चुनें');return}
+if(f.type!=='application/pdf'){alert('कृपया PDF चुनें');return}
+let url=URL.createObjectURL(f),price=Number(document.getElementById('price').value||0);
+let d=document.createElement('div');d.style='border-top:1px solid #ddd;padding:12px 0';
+d.innerHTML='<b>'+document.getElementById('course').value+' • '+s+' • '+c+'</b><br>₹'+price+' • '+f.name+'<br><a target="_blank" href="'+url+'">PDF देखें / डाउनलोड करें</a>';
+let box=document.getElementById('items');if(box.textContent.includes('अभी कोई नोट्स'))box.textContent='';box.prepend(d);document.getElementById('pdf').value='';
+}
+</script></main></html>
